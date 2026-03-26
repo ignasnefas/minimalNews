@@ -31,6 +31,22 @@ function getWebGLInfo() {
 }
 
 function getSystemInfo() {
+  if (typeof window === 'undefined' || typeof navigator === 'undefined') {
+    return {
+      os: 'Unknown',
+      browser: 'Unknown',
+      screen: '0x0',
+      viewport: '0x0',
+      platform: 'Unknown',
+      cpuCores: 'Unavailable',
+      deviceMemory: 'Unavailable',
+      pixelRatio: 1,
+      languages: 'Unknown',
+      timeZone: 'Unknown',
+      touchPoints: 0,
+    };
+  }
+
   const ua = navigator.userAgent || '';
   const platform = navigator.platform || 'Unknown';
   const screen = `${window.screen?.width || 0}x${window.screen?.height || 0}`;
@@ -71,7 +87,7 @@ function getSystemInfo() {
 
 export default function SystemInfoWidget() {
   const [uptime, setUptime] = useState(0);
-  const [info] = useState(getSystemInfo());
+  const [info, setInfo] = useState(getSystemInfo());
 
   const [battery, setBattery] = useState<string>('Unavailable');
   const [connection, setConnection] = useState<string>('Unavailable');
@@ -85,6 +101,10 @@ export default function SystemInfoWidget() {
       setUptime(Math.floor((Date.now() - start) / 1000));
     }, 1000);
     return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    setInfo(getSystemInfo());
   }, []);
 
   useEffect(() => {
