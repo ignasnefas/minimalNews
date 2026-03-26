@@ -7,14 +7,23 @@ export async function GET(request: Request) {
   const sort = searchParams.get('sort') || 'hot'; // hot, new, top, rising
   const limit = Math.min(parseInt(searchParams.get('limit') || '15', 10), 25);
 
-  const redditHosts = ['https://www.reddit.com', 'https://old.reddit.com'];
+  // prefer the official api.reddit.com endpoint (less likely to be blocked by security / hosting policies)
+  // avoid old.reddit.com where Vercel and cloud workers are often blocked.
+  const redditHosts = ['https://api.reddit.com', 'https://www.reddit.com'];
   const query = `/r/${subreddit}/${sort}.json?limit=${limit}&raw_json=1`;
+
+  function getUserAgent() {
+    return (
+      process.env.REDDIT_USER_AGENT ||
+      'minimal-news/1.0 (by u/minimal-news-app) - contact: https://github.com/your-user/minimalNews'
+    );
+  }
 
   async function fetchFromHost(host: string) {
     const redditUrl = `${host}${query}`;
     const response = await fetch(redditUrl, {
       headers: {
-        'User-Agent': 'minimal-news/1.0 (by u/your-reddit-username)',
+        'User-Agent': getUserAgent(),
         'Accept': 'application/json',
       },
       next: { revalidate: 300 }, // Cache for 5 minutes
@@ -32,10 +41,12 @@ export async function GET(request: Request) {
         if (response.ok) break;
 
         const body = await response.text().catch(() => '<unreadable body>');
-        lastError = `Reddit API unavailable from ${host}: ${response.status} ${response.statusText} - ${body}`;
+        const blockedContent = /<html|<body|whoa there, pardner!/i.test(body);
 
-        // Retry with next host on 403/429 / blocked signals
-        if (response.status !== 403 && response.status !== 429) {
+        lastError = `Reddit API unavailable from ${host}: ${response.status} ${response.statusText} - ${blockedContent ? 'blocked by network policy' : body}`;
+
+        // Retry with next host on 403/429 or HTML-blocked pages
+        if (!blockedContent && response.status !== 403 && response.status !== 429) {
           break;
         }
       } catch (subError) {

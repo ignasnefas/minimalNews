@@ -34,10 +34,11 @@ function formatTime(date: Date, timeZone: string) {
 
 export default function WorldClocksWidget() {
   const [zones, setZones] = useState<string[]>(DEFAULT_ZONES);
-  const [now, setNow] = useState(new Date());
+  const [now, setNow] = useState<Date | null>(null);
   const [newZone, setNewZone] = useState('');
 
   useEffect(() => {
+    setNow(new Date());
     const t = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(t);
   }, []);
@@ -59,8 +60,11 @@ export default function WorldClocksWidget() {
     setZones(prev => prev.filter(z => z !== zone));
   };
 
+  const activeNow = now ?? new Date();
+  const statusText = now ? `Updated: ${now.toLocaleTimeString()}` : 'Updated: --:--:--';
+
   return (
-    <TerminalBox title="clocks --world" icon="🕒" status={`Updated: ${now.toLocaleTimeString()}`}>
+    <TerminalBox title="clocks --world" icon="🕒" status={statusText}>
       <div className={styles.container}>
         <div className={styles.controls}>
           <input className={styles.input} value={newZone} onChange={(e) => setNewZone(e.target.value)} placeholder="Enter IANA timezone (e.g. Europe/London)" />
@@ -73,7 +77,7 @@ export default function WorldClocksWidget() {
           ) : (
             zones.map((z) => (
               <div key={z} className={styles.row}>
-                <div className={styles.time}>{formatTime(now, z)}</div>
+                <div className={styles.time}>{formatTime(activeNow, z)}</div>
                 <div className={styles.zone}>{z}</div>
                 <button className={styles.remove} onClick={() => removeZone(z)}>✕</button>
               </div>

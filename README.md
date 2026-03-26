@@ -49,7 +49,11 @@ Open [http://localhost:3000](http://localhost:3000) to view the app.
 
 ### Environment Variables
 
-No environment variables are required for this application. All data is fetched from public sources without API keys.
+- `REDDIT_USER_AGENT` (optional, strongly recommended on Vercel/hosted environments)
+  - default: `minimal-news/1.0 (by u/minimal-news-app) - contact: https://github.com/your-user/minimalNews`
+  - set to a unique descriptive value like `minimal-news/1.0 (by u/creds) v1.0` to avoid Reddit rate-limits/blocks.
+
+No other environment variables are required for this application. All data is fetched from public sources without API keys.
 
 ### Build for Production
 

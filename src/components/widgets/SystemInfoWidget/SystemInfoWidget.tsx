@@ -87,7 +87,19 @@ function getSystemInfo() {
 
 export default function SystemInfoWidget() {
   const [uptime, setUptime] = useState(0);
-  const [info, setInfo] = useState(getSystemInfo());
+  const [info, setInfo] = useState(() => ({
+    os: 'Unknown',
+    browser: 'Unknown',
+    screen: '0x0',
+    viewport: '0x0',
+    platform: 'Unknown',
+    cpuCores: 'Unavailable',
+    deviceMemory: 'Unavailable',
+    pixelRatio: 1,
+    languages: 'Unknown',
+    timeZone: 'Unknown',
+    touchPoints: 0,
+  }));
 
   const [battery, setBattery] = useState<string>('Unavailable');
   const [connection, setConnection] = useState<string>('Unavailable');

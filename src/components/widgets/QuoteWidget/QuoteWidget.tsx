@@ -27,7 +27,7 @@ export default function QuoteWidget() {
 
   const copyQuote = async () => {
     try {
-      await navigator.clipboard.writeText(`"${quote.text}" — ${quote.author}`);
+      await navigator.clipboard.writeText(`${quote.text} — ${quote.author}`);
     } catch (err) {
       console.error('Copy failed', err);
     }
@@ -36,9 +36,7 @@ export default function QuoteWidget() {
   return (
     <div className={styles.container}>
       <div className={styles.quote}>
-        <span className={styles.mark}>"</span>
         {quote.text}
-        <span className={styles.mark}>"</span>
       </div>
       <div className={styles.authorRow}>
         <span className={styles.author}>— {quote.author}</span>
