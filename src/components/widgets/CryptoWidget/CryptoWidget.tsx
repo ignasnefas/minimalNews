@@ -4,8 +4,8 @@ import { useEffect, useState, useRef } from 'react';
 import TerminalBox from '@/components/ui/TerminalBox';
 import styles from './CryptoWidget.module.css';
 
-const DEFAULT_CRYPTO_SYMBOLS: string[] = [];
-const DEFAULT_STOCK_SYMBOLS: string[] = [];
+const DEFAULT_CRYPTO_SYMBOLS: string[] = ['BTC', 'ETH', 'SOL', 'DOGE'];
+const DEFAULT_STOCK_SYMBOLS: string[] = ['AAPL', 'MSFT', 'GOOGL'];
 const CRYPTO_SYMBOL_MAP: Record<string, string> = {
   BTC: 'bitcoin',
   ETH: 'ethereum',

@@ -51,6 +51,7 @@ export default function RedditWidget({ subreddit: initialSubreddit = 'all' }: Re
   async function fetchPosts() {
     setLoading(true);
     setError(null);
+    setPosts([]);
 
     try {
       const response = await fetch(
@@ -58,11 +59,16 @@ export default function RedditWidget({ subreddit: initialSubreddit = 'all' }: Re
       );
       const result: ApiResponse<RedditPost[]> = await response.json();
 
-      if (result.data) {
+      if (result.data && Array.isArray(result.data) && result.data.length > 0) {
         setPosts(result.data);
       }
+
       if (result.error) {
         setError(result.error);
+      }
+
+      if (!result.data && !result.error) {
+        setError('No Reddit data returned from API');
       }
     } catch (err) {
       setError('Failed to fetch Reddit posts');
