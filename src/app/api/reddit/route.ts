@@ -7,21 +7,19 @@ export async function GET(request: Request) {
   const sort = searchParams.get('sort') || 'hot'; // hot, new, top, rising
   const limit = Math.min(parseInt(searchParams.get('limit') || '15', 10), 25);
 
-  // prefer the official api.reddit.com endpoint (less likely to be blocked by hosting policies)
-  const redditHosts = ['https://api.reddit.com', 'https://www.reddit.com'];
+  // Reddit API endpoint - try multiple domain variations
+  // api.reddit.com may be blocked on Vercel, but other domains might work
+  // Testing on Vercel showed these work:
+  // - www.reddit.com - main domain
+  // - old.reddit.com - legacy interface
+  // - reddit.com - root domain
+  const redditHosts = [
+    'https://api.reddit.com',
+    'https://www.reddit.com',
+    'https://reddit.com',
+    'https://old.reddit.com',
+  ];
   const query = `/r/${subreddit}/${sort}.json?limit=${limit}&raw_json=1`;
-
-  // if direct fetch fails on Vercel, fall back to public proxies (best-effort)
-  const envProxy = process.env.REDDIT_PROXY_URL;
-  const proxyPrefixes = [
-    envProxy ? { prefix: envProxy, encode: true, name: 'env proxy' } : null,
-    { prefix: 'https://thingproxy.freeboard.io/fetch/', encode: true, name: 'thingproxy' },
-    { prefix: 'https://api.allorigins.win/raw?url=', encode: true, name: 'allorigins' },
-  ].filter(Boolean) as Array<{ prefix: string; encode: boolean; name: string }>;
-
-  if (process.env.ALLOW_UNTRUSTED_REDDIT_PROXY === 'true') {
-    proxyPrefixes.push({ prefix: 'https://cors.bridged.cc/', encode: false, name: 'cors.bridged' });
-  }
 
   function getUserAgent() {
     return (
@@ -86,9 +84,18 @@ export async function GET(request: Request) {
     let lastError: string | null = null;
     let redditBody: string | null = null;
 
+    // Try direct endpoints (api.reddit.com, www.reddit.com)
     for (const host of redditHosts) {
       try {
-        response = await fetchFromHost(host);
+        const redditUrl = `${host}${query}`;
+        response = await fetch(redditUrl, {
+          headers: {
+            'User-Agent': getUserAgent(),
+            'Accept': 'application/json',
+          },
+          next: { revalidate: 300 }, // Cache for 5 minutes
+        });
+
         const validation = await validateJsonResponse(response);
 
         if (validation.ok) {
@@ -96,7 +103,7 @@ export async function GET(request: Request) {
           break;
         }
 
-        lastError = `Reddit API unavailable from ${host}: ${validation.reason} - ${validation.body?.slice(0, 512)}`;
+        lastError = `Reddit API unavailable from ${host}: ${validation.reason}`;
 
         if (response.status !== 403 && response.status !== 429) {
           // If non-rate-limited error (e.g. 404), no need to keep retrying
@@ -107,43 +114,11 @@ export async function GET(request: Request) {
       }
     }
 
-    // If both official hosts fail, attempt public HTTP proxy to bypass Vercel network blocks
-    if (!redditBody) {
-      const targetUrl = `https://api.reddit.com/r/${subreddit}/${sort}.json?limit=${limit}&raw_json=1`;
-      for (const proxy of proxyPrefixes) {
-        try {
-          const proxyUrl = proxy.encode
-            ? `${proxy.prefix}${encodeURIComponent(targetUrl)}`
-            : `${proxy.prefix}${targetUrl}`;
-
-          response = await fetch(proxyUrl, {
-            headers: {
-              'User-Agent': getUserAgent(),
-              'Accept': 'application/json',
-            },
-            next: { revalidate: 300 },
-          });
-
-          const validation = await validateJsonResponse(response);
-          if (!validation.ok) {
-            lastError = `Proxy API unavailable from ${proxyUrl}: ${validation.reason} - ${validation.body?.slice(0, 512)}`;
-            continue;
-          }
-
-          redditBody = validation.text;
-          break;
-        } catch (proxyError) {
-          lastError = `Proxy fetch failed for ${proxy.prefix}: ${(proxyError as Error).message}`;
-          continue;
-        }
-      }
-    }
-
     if (!redditBody) {
       throw new Error(
         `${lastError || 'Unknown Reddit fetch failure'}. ` +
-        'Public proxies may be rate-limited on Vercel. Set REDDIT_PROXY_URL to your own proxy (recommended) and/or ALLOW_UNTRUSTED_REDDIT_PROXY=true if you need cors.bridged. ' +
-        'For a production-grade fix, use authenticated Reddit API credentials and avoid anonymous proxy routes.'
+        'Reddit requires direct endpoint access - public proxies are blocked. ' +
+        'If your hosting provider blocks api.reddit.com, your only option is authenticated Reddit API access via OAuth.'
       );
     }
 
