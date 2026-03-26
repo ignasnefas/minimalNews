@@ -87,13 +87,16 @@ function formatDate(dateStr: string): string {
   return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
 }
 
+const DEFAULT_LOCATION = 'London';
+
 export default function WeatherWidget() {
   const { props: { location }, updateProps } = useWidgetProps({} as { location?: string });
   const [inputValue, setInputValue] = useState('');
   const [locationDetected, setLocationDetected] = useState(false);
   const [detectingLocation, setDetectingLocation] = useState(true);
 
-  const apiUrl = location ? `/api/weather?location=${encodeURIComponent(location)}` : null;
+  const effectiveLocation = location || DEFAULT_LOCATION;
+  const apiUrl = `/api/weather?location=${encodeURIComponent(effectiveLocation)}`;
 
   const { data: weather, loading, error, refetch } = useWidgetData<WeatherData>(
     apiUrl,
@@ -165,12 +168,16 @@ export default function WeatherWidget() {
           }
         );
       } else {
-        // No geolocation support
+        // No geolocation support; fallback to London
+        if (!location) {
+          updateProps({ location: DEFAULT_LOCATION });
+          setInputValue(DEFAULT_LOCATION);
+        }
         setLocationDetected(true);
         setDetectingLocation(false);
       }
     }
-  }, [locationDetected, detectingLocation, updateProps]);
+  }, [locationDetected, detectingLocation, location, updateProps]);
 
   const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();

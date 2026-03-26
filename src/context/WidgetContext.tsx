@@ -23,6 +23,7 @@ interface WidgetContextType {
   resetWidgets: () => void;
   isEnabled: (id: string) => boolean;
   moveWidget: (id: string, dir: 'up' | 'down') => void;
+  reorderWidgets: (orderedIds: string[]) => void;
 }
 
 const WidgetContext = createContext<WidgetContextType | undefined>(undefined);
@@ -34,16 +35,14 @@ const DEFAULT_WIDGETS: WidgetConfig[] = [
   { id: 'hackernews', component: 'HackerNewsWidget' },
   { id: 'news', component: 'NewsWidget' },
   { id: 'reddit', component: 'RedditWidget' },
-];
-
-// All available widgets (includes new widgets like crypto and clocks)
-const AVAILABLE_WIDGETS: WidgetConfig[] = [
-  ...DEFAULT_WIDGETS,
   { id: 'crypto', component: 'CryptoWidget' },
   { id: 'clocks', component: 'WorldClocksWidget' },
   { id: 'todo', component: 'TodoWidget' },
   { id: 'systeminfo', component: 'SystemInfoWidget' },
 ];
+
+// All available widgets (includes new widgets like crypto and clocks)
+const AVAILABLE_WIDGETS: WidgetConfig[] = [...DEFAULT_WIDGETS];
 
 export function WidgetProvider({ children }: { children: ReactNode }) {
   // Initialize widgets from localStorage if available to preserve enabled/disabled state across refreshes.
@@ -119,17 +118,24 @@ export function WidgetProvider({ children }: { children: ReactNode }) {
     return widgets.some(w => w.id === id);
   }, [widgets]);
 
-  // Move widget up or down within the enabled widgets list
+  // Move widget up or down within the enabled widgets list (quote is header-only, keep it anchored)
   const moveWidget = useCallback((id: string, dir: 'up' | 'down') => {
     setWidgets(prev => {
-      const idx = prev.findIndex(w => w.id === id);
+      if (id === 'quote') return prev; // no reordering needed; quote stays in header
+
+      const quoteWidget = prev.find(w => w.id === 'quote');
+      const nonQuote = prev.filter(w => w.id !== 'quote');
+      const idx = nonQuote.findIndex(w => w.id === id);
       if (idx === -1) return prev;
-      const newIdx = dir === 'up' ? Math.max(0, idx - 1) : Math.min(prev.length - 1, idx + 1);
+
+      const newIdx = dir === 'up' ? Math.max(0, idx - 1) : Math.min(nonQuote.length - 1, idx + 1);
       if (newIdx === idx) return prev;
-      const arr = [...prev];
+
+      const arr = [...nonQuote];
       const [item] = arr.splice(idx, 1);
       arr.splice(newIdx, 0, item);
-      return arr;
+
+      return quoteWidget ? [quoteWidget, ...arr] : arr;
     });
   }, []);
 
@@ -168,6 +174,17 @@ export function WidgetProvider({ children }: { children: ReactNode }) {
     }
   }, [updateWidgetProps, enableWidget, disableWidget, toggleWidget]);
 
+  const reorderWidgets = useCallback((orderedIds: string[]) => {
+    setWidgets(prev => {
+      const quoteWidget = prev.find(w => w.id === 'quote');
+      const nonQuote = prev.filter(w => w.id !== 'quote');
+      const ordered = orderedIds
+        .map(id => nonQuote.find(w => w.id === id))
+        .filter((w): w is WidgetConfig => Boolean(w));
+      return quoteWidget ? [quoteWidget, ...ordered] : ordered;
+    });
+  }, []);
+
   const value = {
     widgets,
     availableWidgets: AVAILABLE_WIDGETS,
@@ -183,6 +200,7 @@ export function WidgetProvider({ children }: { children: ReactNode }) {
     resetWidgets,
     isEnabled,
     moveWidget,
+    reorderWidgets,
   };
 
   return (

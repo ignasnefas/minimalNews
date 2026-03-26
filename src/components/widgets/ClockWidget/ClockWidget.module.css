@@ -21,9 +21,9 @@
 }
 
 .seconds {
-  color: var(--secondary);
-  font-size: 1.5rem;
-  vertical-align: super;
+  color: var(--primary);
+  font-size: inherit;
+  vertical-align: baseline;
 }
 
 .date {

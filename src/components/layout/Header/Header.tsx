@@ -2,6 +2,7 @@
 
 import ThemeToggle from '@/components/ui/ThemeToggle';
 import ClockWidget from '@/components/widgets/ClockWidget';
+import QuoteWidget from '@/components/widgets/QuoteWidget';
 import WidgetsManager from '@/components/layout/WidgetsManager/WidgetsManager';
 import { useWidgets } from '@/context/WidgetContext';
 import styles from './Header.module.css';
@@ -11,15 +12,7 @@ interface HeaderProps {
 }
 
 const ASCII_LOGO = `
-╔═══════════════════════════════════════════════════════════════╗
-║  ████████╗███████╗██████╗ ███╗   ███╗██╗███╗   ██╗ █████╗ ██╗ ║
-║  ╚══██╔══╝██╔════╝██╔══██╗████╗ ████║██║████╗  ██║██╔══██╗██║ ║
-║     ██║   █████╗  ██████╔╝██╔████╔██║██║██╔██╗ ██║███████║██║ ║
-║     ██║   ██╔══╝  ██╔══██╗██║╚██╔╝██║██║██║╚██╗██║██╔══██║██║ ║
-║     ██║   ███████╗██║  ██║██║ ╚═╝ ██║██║██║ ╚████║██║  ██║███╗║
-║     ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══╝║
-║              ══════ DIGITAL DETOX HUB ══════                  ║
-╚═══════════════════════════════════════════════════════════════╝`;
+════════════ DIGITAL DETOX TERMINAL ════════════`;
 
 const ASCII_LOGO_MOBILE = `
 ┌─────────────────────┐
@@ -30,6 +23,7 @@ const ASCII_LOGO_MOBILE = `
 
 export default function Header({ onOpenCli }: HeaderProps) {
   const { widgets } = useWidgets();
+  const showQuote = widgets.some(w => w.id === 'quote');
   const activeFlags = widgets.length > 0 ? widgets.map(w => `--${w.id}`).join(' ') : '--none';
 
   return (
@@ -38,24 +32,23 @@ export default function Header({ onOpenCli }: HeaderProps) {
         <pre className={styles.logo} aria-label="Terminal Detox">{ASCII_LOGO}</pre>
         <pre className={styles.logoMobile} aria-label="Terminal Detox">{ASCII_LOGO_MOBILE}</pre>
       </div>
+      <div className={styles.topControls}>
+        <ThemeToggle />
+        <WidgetsManager />
+        {onOpenCli && (
+          <button onClick={onOpenCli} className={styles.cliButton} aria-label="Open CLI">
+            ⌘
+          </button>
+        )}
+      </div>
       <div className={styles.headerContent}>
         <ClockWidget />
-        <div className={styles.controls}>
-          <ThemeToggle />
-          <WidgetsManager />
-          {onOpenCli && (
-            <button onClick={onOpenCli} className={styles.cliButton}>
-              [⌘] cli
-            </button>
-          )}
-          <a href="#" className={styles.helpLink}>[?] help</a>
-        </div>
+        {showQuote && <QuoteWidget />}
       </div>
       <div className={styles.tagline}>
         <span className={styles.prompt}>$</span>
         <span className={styles.command}>fetch</span>
         <span className={styles.args}>{activeFlags}</span>
-        <span className={styles.cursor}>▋</span>
       </div>
     </header>
   );

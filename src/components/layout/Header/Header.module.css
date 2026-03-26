@@ -31,6 +31,55 @@
   overflow-y: hidden;
 }
 
+.topControls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+  font-size: var(--font-size-sm);
+  padding: 0.25rem 0.5rem;
+}
+
+.topControls .icon {
+  font-size: 1rem;
+  color: var(--primary);
+}
+
+.topControls .toggle,
+.topControls .cliButton,
+.topControls .smallBtn,
+.topControls .iconBtn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--foreground);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  width: 28px;
+  height: 28px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.topControls .iconBtn {
+  border-color: var(--border);
+  background: none;
+}
+
+.topControls button:hover,
+.topControls .cliButton:hover,
+.topControls .smallBtn:hover {
+  background: var(--primary);
+  color: var(--background);
+  border-color: var(--primary);
+}
+
 .headerContent {
   display: flex;
   flex-direction: column;
@@ -95,7 +144,7 @@
 
 .cursor {
   color: var(--primary);
-  animation: blink 1s step-end infinite;
+  animation: none;
 }
 
 @keyframes blink {

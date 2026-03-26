@@ -25,6 +25,14 @@ export default function QuoteWidget() {
 
   if (!quote) return null;
 
+  const copyQuote = async () => {
+    try {
+      await navigator.clipboard.writeText(`"${quote.text}" — ${quote.author}`);
+    } catch (err) {
+      console.error('Copy failed', err);
+    }
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.quote}>
@@ -32,10 +40,17 @@ export default function QuoteWidget() {
         {quote.text}
         <span className={styles.mark}>"</span>
       </div>
-      <div className={styles.author}>— {quote.author}</div>
-      <button onClick={fetchQuote} className={styles.button}>
-        New Quote
-      </button>
+      <div className={styles.authorRow}>
+        <span className={styles.author}>— {quote.author}</span>
+        <div className={styles.authorActions}>
+          <button onClick={fetchQuote} className={styles.iconButton} aria-label="New Quote">
+            ↻
+          </button>
+          <button onClick={copyQuote} className={styles.iconButton} aria-label="Copy Quote">
+            📋
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

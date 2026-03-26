@@ -64,6 +64,66 @@
   color: var(--primary);
 }
 
+.aboutBtn {
+  background: none;
+  border: none;
+  color: var(--secondary);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  padding: 2px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.aboutBtn:hover {
+  color: var(--primary);
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+}
+
+.modal {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: var(--spacing-md);
+  width: min(90vw, 400px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-sm);
+  font-weight: bold;
+  color: var(--primary);
+}
+
+.close {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--foreground);
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.modalContent {
+  color: var(--fg);
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+}
+
 .status {
   display: flex;
   align-items: center;

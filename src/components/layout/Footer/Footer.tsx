@@ -1,39 +1,40 @@
+import { useState } from 'react';
 import styles from './Footer.module.css';
 
 export default function Footer() {
-  const year = new Date().getFullYear();
-  
+  const [isAboutOpen, setIsAboutOpen] = useState(false);
+
   return (
     <footer className={styles.footer}>
-      <div className={styles.divider}>═</div>
       <div className={styles.content}>
-        <div className={styles.ascii}>
-          {'┌──────────────────────────────────────────────────────────────┐'}
-        </div>
-        <div className={styles.info}>
-          <span className={styles.copyright}>
-            © {year} Terminal Detox
-          </span>
-          <span className={styles.separator}>│</span>
-          <span className={styles.tagline}>
-            Your minimal digital essentials hub
-          </span>
-        </div>
         <div className={styles.links}>
-          <a href="https://github.com" target="_blank" rel="noopener noreferrer">[github]</a>
+          <a href="https://github.com/ignasnefas" target="_blank" rel="noopener noreferrer">[github]</a>
           <span className={styles.separator}>│</span>
-          <a href="/about">[about]</a>
-          <span className={styles.separator}>│</span>
-          <a href="/privacy">[privacy]</a>
-        </div>
-        <div className={styles.status}>
-          <span className={styles.statusIndicator}>●</span>
-          <span>All systems operational</span>
-        </div>
-        <div className={styles.ascii}>
-          {'└──────────────────────────────────────────────────────────────┘'}
+          <button
+            className={styles.aboutBtn}
+            onClick={() => setIsAboutOpen(true)}
+            type="button"
+          >
+            [about]
+          </button>
         </div>
       </div>
+
+      {isAboutOpen && (
+        <div className={styles.overlay} onClick={() => setIsAboutOpen(false)}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <span>About Terminal Detox</span>
+              <button className={styles.close} onClick={() => setIsAboutOpen(false)} type="button">✕</button>
+            </div>
+            <div className={styles.modalContent}>
+              <p>Terminal Detox is a minimal dashboard concept built with Next.js and React.</p>
+              <p>It includes widgets for weather, news, crypto, world clocks, and a command-line interface.</p>
+              <p>Use the UI toolbar to toggle theme, widgets, and CLI commands.</p>
+            </div>
+          </div>
+        </div>
+      )}
     </footer>
   );
 }

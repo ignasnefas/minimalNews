@@ -1,5 +1,20 @@
 .wrapper { display: inline-block; }
-.iconBtn { background: none; border: none; cursor: pointer; color: var(--muted); padding: 6px; }
+.iconBtn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--foreground);
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+.iconBtn:hover {
+  background: var(--border);
+}
 .overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 2000;
 }

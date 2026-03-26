@@ -1,7 +1,7 @@
 .container {
   text-align: center;
-  padding: var(--spacing-lg);
-  border: 1px dashed var(--border);
+  padding: var(--spacing-md);
+  border: none;
   margin-bottom: var(--spacing-md);
 }
 
@@ -12,6 +12,9 @@
   font-style: italic;
   max-width: 600px;
   margin: 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
 }
 
 .mark {
@@ -20,10 +23,43 @@
   font-style: normal;
 }
 
-.author {
+.authorRow {
   margin-top: var(--spacing-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+}
+
+.author {
   color: var(--secondary);
   font-size: var(--font-size-sm);
+}
+
+.authorActions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.iconButton {
+  background: none;
+  border: none;
+  color: var(--secondary);
+  width: 22px;
+  height: 22px;
+  font-size: 0.85rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+.iconButton:hover {
+  color: var(--primary);
+  transform: scale(1.05);
 }
 
 .button {

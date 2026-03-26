@@ -49,15 +49,16 @@ const WIDGET_COMPONENTS = {
 };
 
 export default function Home() {
-  const { widgets, executeCommand, refreshKey } = useWidgets();
+  const { widgets, executeCommand, refreshKey, reorderWidgets } = useWidgets();
   const [isCliOpen, setIsCliOpen] = useState(false);
   const [isFocusMode, setIsFocusMode] = useState(false);
-  const [widgetOrder, setWidgetOrder] = useState(widgets.map(w => w.id));
+  const [widgetOrder, setWidgetOrder] = useState(() => widgets.filter(w => w.id !== 'quote').map(w => w.id));
 
-  // Keep widget order in sync when enabled widgets change
+  // Keep widget order in sync when enabled widgets change (exclude quote widget from main grid, it is rendered in Header)
   useEffect(() => {
-    setWidgetOrder(widgets.map(w => w.id));
+    setWidgetOrder(widgets.filter(w => w.id !== 'quote').map(w => w.id));
   }, [widgets]);
+
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -78,7 +79,9 @@ export default function Home() {
         const oldIndex = items.indexOf(active.id as string);
         const newIndex = items.indexOf(over.id as string);
 
-        return arrayMove(items, oldIndex, newIndex);
+        const nextOrder = arrayMove(items, oldIndex, newIndex);
+        reorderWidgets(nextOrder);
+        return nextOrder;
       });
     }
   };
@@ -97,6 +100,10 @@ export default function Home() {
   });
 
   const renderWidget = (widgetId: string) => {
+    if (widgetId === 'quote') {
+      return null;
+    }
+
     const widget = widgets.find(w => w.id === widgetId);
     if (!widget) return null;
 

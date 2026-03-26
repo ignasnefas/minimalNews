@@ -1,13 +1,15 @@
 .toggle {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  background: transparent;
+  justify-content: center;
+  background: none;
   border: 1px solid var(--border);
-  color: var(--fg);
+  color: var(--foreground);
   font-family: var(--font-mono);
   font-size: var(--font-size-sm);
-  padding: var(--spacing-xs) var(--spacing-sm);
+  width: 28px;
+  height: 28px;
+  padding: 0;
   cursor: pointer;
   transition: all 0.2s ease;
 }

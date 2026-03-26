@@ -4,10 +4,32 @@ import { useEffect, useState } from 'react';
 import TerminalBox from '@/components/ui/TerminalBox';
 import styles from './WorldClocksWidget.module.css';
 
-const DEFAULT_ZONES: string[] = [];
+const DEFAULT_ZONES: string[] = [
+  'UTC',
+  'America/New_York',
+  'Europe/London',
+  'Asia/Tokyo',
+];
+
+function isValidTimeZone(timeZone: string) {
+  try {
+    new Intl.DateTimeFormat('en-US', { timeZone }).format();
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 function formatTime(date: Date, timeZone: string) {
-  return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone });
+  if (!isValidTimeZone(timeZone)) {
+    return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  }
+
+  try {
+    return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone });
+  } catch {
+    return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  }
 }
 
 export default function WorldClocksWidget() {
@@ -21,8 +43,15 @@ export default function WorldClocksWidget() {
   }, []);
 
   const addZone = () => {
-    if (!newZone) return;
-    if (!zones.includes(newZone)) setZones(prev => [...prev, newZone]);
+    const trimmed = newZone.trim();
+    if (!trimmed) return;
+
+    if (!isValidTimeZone(trimmed)) {
+      alert('Invalid timezone. Please enter a valid IANA timezone (e.g. Europe/London).');
+      return;
+    }
+
+    if (!zones.includes(trimmed)) setZones(prev => [...prev, trimmed]);
     setNewZone('');
   };
 

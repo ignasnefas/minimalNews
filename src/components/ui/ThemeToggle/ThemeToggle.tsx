@@ -16,9 +16,6 @@ export default function ThemeToggle() {
       <span className={styles.icon}>
         {theme === 'dark' ? '☀' : '☾'}
       </span>
-      <span className={styles.label}>
-        [{theme === 'dark' ? 'light' : 'dark'}]
-      </span>
     </button>
   );
 }
