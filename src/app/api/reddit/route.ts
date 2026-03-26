@@ -13,9 +13,9 @@ export async function GET(request: Request) {
 
   // if direct fetch fails on Vercel, fall back to public proxies (best-effort)
   const proxyPrefixes = [
-    'https://api.allorigins.win/raw?url=',
-    'https://thingproxy.freeboard.io/fetch/',
-    'https://cors.bridged.cc/',
+    { prefix: 'https://api.allorigins.win/raw?url=', encode: true },
+    { prefix: 'https://thingproxy.freeboard.io/fetch/', encode: true },
+    { prefix: 'https://cors.bridged.cc/', encode: false },
   ];
 
   function getUserAgent() {
@@ -104,9 +104,13 @@ export async function GET(request: Request) {
 
     // If both official hosts fail, attempt public HTTP proxy to bypass Vercel network blocks
     if (!redditBody) {
+      const targetUrl = `https://api.reddit.com/r/${subreddit}/${sort}.json?limit=${limit}&raw_json=1`;
       for (const proxy of proxyPrefixes) {
         try {
-          const proxyUrl = `${proxy}${encodeURIComponent(`https://api.reddit.com/r/${subreddit}/${sort}.json?limit=${limit}&raw_json=1`)}`;
+          const proxyUrl = proxy.encode
+            ? `${proxy.prefix}${encodeURIComponent(targetUrl)}`
+            : `${proxy.prefix}${targetUrl}`;
+
           response = await fetch(proxyUrl, {
             headers: {
               'User-Agent': getUserAgent(),
@@ -124,7 +128,7 @@ export async function GET(request: Request) {
           redditBody = validation.text;
           break;
         } catch (proxyError) {
-          lastError = `Proxy fetch failed for ${proxy}: ${(proxyError as Error).message}`;
+          lastError = `Proxy fetch failed for ${proxy.prefix}: ${(proxyError as Error).message}`;
           continue;
         }
       }
