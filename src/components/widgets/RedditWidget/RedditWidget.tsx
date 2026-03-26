@@ -48,33 +48,83 @@ export default function RedditWidget({ subreddit: initialSubreddit = 'all' }: Re
     fetchPosts();
   }, [subreddit, sort]);
 
+  async function fetchPostsDirectly(redditUrl: string) {
+    try {
+      const response = await fetch(redditUrl, {
+        headers: {
+          'User-Agent': 'minimal-news/1.0',
+          'Accept': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        return null;
+      }
+
+      const data = await response.json();
+      if (data?.data?.children) {
+        return data.data.children
+          .filter((child: any) => child?.kind === 't3' && child?.data)
+          .map((child: any) => {
+            const post = child.data;
+            return {
+              id: post.id,
+              title: post.title,
+              subreddit: post.subreddit,
+              score: post.score,
+              numComments: post.num_comments,
+              url: post.url,
+              permalink: `https://reddit.com${post.permalink}`,
+              author: post.author,
+              createdAt: new Date(post.created_utc * 1000).toISOString(),
+            };
+          });
+      }
+    } catch (err) {
+      return null;
+    }
+  }
+
   async function fetchPosts() {
     setLoading(true);
     setError(null);
     setPosts([]);
 
-    try {
-      const response = await fetch(
-        `/api/reddit?subreddit=${subreddit}&sort=${sort}&limit=10`
-      );
-      const result: ApiResponse<RedditPost[]> = await response.json();
+    const query = `/r/${subreddit}/${sort}.json?limit=10&raw_json=1`;
+    
+    // Try multiple Reddit domains (different IPs, user's browser can reach some)
+    const redditUrls = [
+      `https://api.reddit.com${query}`,
+      `https://www.reddit.com${query}`,
+      `https://reddit.com${query}`,
+      `https://old.reddit.com${query}`,
+    ];
 
-      if (result.data && Array.isArray(result.data) && result.data.length > 0) {
-        setPosts(result.data);
-      }
+    let posts: RedditPost[] | null = null;
 
-      if (result.error) {
-        setError(result.error);
+    // Try each URL in sequence
+    for (const url of redditUrls) {
+      posts = await fetchPostsDirectly(url);
+      if (posts && posts.length > 0) {
+        setPosts(posts);
+        setLoading(false);
+        return;
       }
-
-      if (!result.data && !result.error) {
-        setError('No Reddit data returned from API');
-      }
-    } catch (err) {
-      setError('Failed to fetch Reddit posts');
-    } finally {
-      setLoading(false);
     }
+
+    // If all direct URLs fail, try CORS proxy
+    const corsProxyUrl = `https://api.cors.sh/?url=${encodeURIComponent(`https://api.reddit.com${query}`)}`;
+    posts = await fetchPostsDirectly(corsProxyUrl);
+    
+    if (posts && posts.length > 0) {
+      setPosts(posts);
+      setLoading(false);
+      return;
+    }
+
+    // All methods failed
+    setError('Unable to fetch Reddit posts. Please check your connection or try again.');
+    setLoading(false);
   }
 
   return (
