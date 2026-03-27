@@ -23,7 +23,7 @@ class TodoAppWidget : AppWidgetProvider() {
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
-        if (intent.action == "com.minimalnews.REFRESH_TODO") {
+        if (intent.action == "com.minidash.REFRESH_TODO") {
             val manager = AppWidgetManager.getInstance(context)
             val ids = manager.getAppWidgetIds(ComponentName(context, TodoAppWidget::class.java))
             ids.forEach { id -> displayWidget(context, manager, id) }
@@ -64,7 +64,7 @@ class TodoAppWidget : AppWidgetProvider() {
 
                         // Refresh
                         val refreshIntent = Intent(context, TodoAppWidget::class.java).apply {
-                            action = "com.minimalnews.REFRESH_TODO"
+                            action = "com.minidash.REFRESH_TODO"
                         }
                         views.setOnClickPendingIntent(
                             R.id.refresh_button,

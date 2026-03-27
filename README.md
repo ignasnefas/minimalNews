@@ -1,6 +1,6 @@
-# Terminal Detox - Digital Essentials Hub
+# MiniDash - Digital Essentials Hub
 
-A minimal digital detox webapp that unites all essential stuff like weather, news, social media trending, Reddit, HackerNews/Slashdot in one place, styled with a terminal/ASCII aesthetic like [wttr.in](https://wttr.in/).
+A minimal digital essentials hub that unites all essential stuff like weather, news, social media trending, Reddit, HackerNews/Slashdot in one place, styled with a terminal/ASCII aesthetic like [wttr.in](https://wttr.in/).
 
 ## Features
 
@@ -50,8 +50,8 @@ Open [http://localhost:3000](http://localhost:3000) to view the app.
 ### Environment Variables
 
 - `REDDIT_USER_AGENT` (optional, strongly recommended on Vercel/hosted environments)
-  - default: `minimal-news/1.0 (by u/minimal-news-app) - contact: https://github.com/your-user/minimalNews`
-  - set to a unique descriptive value like `minimal-news/1.0 (by u/creds) v1.0` to avoid Reddit rate-limits/blocks.
+  - default: `minidash/1.0 (by u/minidash) - contact: https://github.com/minidash`
+  - set to a unique descriptive value like `minidash/1.0 (by u/youruser)` to avoid Reddit rate-limits/blocks.
 
 No other environment variables are required for this application. All data is fetched from public sources without API keys.
 

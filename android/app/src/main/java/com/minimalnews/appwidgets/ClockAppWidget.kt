@@ -20,7 +20,7 @@ class ClockAppWidget : AppWidgetProvider() {
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
-        if (intent.action == "com.minimalnews.REFRESH_CLOCK") {
+        if (intent.action == "com.minidash.REFRESH_CLOCK") {
             val manager = AppWidgetManager.getInstance(context)
             val ids = manager.getAppWidgetIds(ComponentName(context, ClockAppWidget::class.java))
             ids.forEach { id -> updateWidget(context, manager, id) }

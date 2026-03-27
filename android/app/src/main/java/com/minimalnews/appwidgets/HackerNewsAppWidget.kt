@@ -23,7 +23,7 @@ class HackerNewsAppWidget : AppWidgetProvider() {
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
-        if (intent.action == "com.minimalnews.REFRESH_HACKERNEWS") {
+        if (intent.action == "com.minidash.REFRESH_HACKERNEWS") {
             val manager = AppWidgetManager.getInstance(context)
             val ids = manager.getAppWidgetIds(ComponentName(context, HackerNewsAppWidget::class.java))
             ids.forEach { id -> displayFromCache(context, manager, id) }
@@ -68,7 +68,7 @@ class HackerNewsAppWidget : AppWidgetProvider() {
 
             // Refresh
             val refreshIntent = Intent(context, HackerNewsAppWidget::class.java).apply {
-                action = "com.minimalnews.REFRESH_HACKERNEWS"
+                action = "com.minidash.REFRESH_HACKERNEWS"
             }
             views.setOnClickPendingIntent(
                 R.id.refresh_button,

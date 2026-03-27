@@ -1,4 +1,4 @@
-@rem Gradle wrapper bootstrap script for MinimalNews Android
+@rem Gradle wrapper bootstrap script for MiniDash Android
 @rem Downloads Gradle and generates the wrapper files
 
 @echo off
@@ -9,7 +9,7 @@ set GRADLE_URL=https://services.gradle.org/distributions/gradle-%GRADLE_VERSION%
 set TEMP_DIR=%TEMP%\gradle-bootstrap
 set GRADLE_DIR=%TEMP_DIR%\gradle-%GRADLE_VERSION%
 
-echo [MinimalNews] Bootstrapping Gradle wrapper...
+echo [MiniDash] Bootstrapping Gradle wrapper...
 
 if not exist "%TEMP_DIR%" mkdir "%TEMP_DIR%"
 

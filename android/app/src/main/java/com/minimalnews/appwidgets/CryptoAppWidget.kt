@@ -23,7 +23,7 @@ class CryptoAppWidget : AppWidgetProvider() {
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
-        if (intent.action == "com.minimalnews.REFRESH_CRYPTO") {
+        if (intent.action == "com.minidash.REFRESH_CRYPTO") {
             val manager = AppWidgetManager.getInstance(context)
             val ids = manager.getAppWidgetIds(ComponentName(context, CryptoAppWidget::class.java))
             ids.forEach { id -> displayFromCache(context, manager, id) }
@@ -67,7 +67,7 @@ class CryptoAppWidget : AppWidgetProvider() {
 
             // Refresh
             val refreshIntent = Intent(context, CryptoAppWidget::class.java).apply {
-                action = "com.minimalnews.REFRESH_CRYPTO"
+                action = "com.minidash.REFRESH_CRYPTO"
             }
             views.setOnClickPendingIntent(
                 R.id.refresh_button,

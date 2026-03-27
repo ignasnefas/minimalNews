@@ -12,7 +12,7 @@ const urls = [
     try {
       const r = await fetch(url, {
         headers: {
-          'User-Agent': 'minimal-news-test/1.0',
+          'User-Agent': 'minidash-test/1.0',
           Accept: 'application/json',
         },
       });

@@ -64,6 +64,16 @@
   color: var(--primary);
 }
 
+.apkLink {
+  color: var(--secondary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.apkLink:hover {
+  color: var(--primary);
+}
+
 .aboutBtn {
   background: none;
   border: none;

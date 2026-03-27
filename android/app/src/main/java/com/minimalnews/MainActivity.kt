@@ -1,4 +1,4 @@
-package com.minimalnews
+package com.minidash
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -9,9 +9,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.minimalnews.ui.screens.MainScreen
-import com.minimalnews.ui.theme.MinimalNewsTheme
-import com.minimalnews.ui.viewmodel.MainViewModel
+import com.minidash.ui.screens.MainScreen
+import com.minidash.ui.theme.MiniDashTheme
+import com.minidash.ui.viewmodel.MainViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

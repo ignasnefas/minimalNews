@@ -6,7 +6,7 @@ async function fetchGitHubTrending(): Promise<SocialTrending['github']> {
   try {
     const response = await fetch('https://github.com/trending', {
       headers: {
-        'User-Agent': 'Terminal-Detox-App/1.0',
+        'User-Agent': 'MiniDash/1.0',
       },
     });
 

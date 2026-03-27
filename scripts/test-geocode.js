@@ -7,7 +7,7 @@
     let t = await r.text();
     console.log('NO-UA body preview:', t.slice(0, 500));
 
-    r = await fetch(url, { headers: { 'User-Agent': 'minimalNews/1.0 (dev@example.com)' } });
+    r = await fetch(url, { headers: { 'User-Agent': 'minidash/1.0 (dev@example.com)' } });
     console.log('WITH-UA status', r.status);
     t = await r.text();
     console.log('WITH-UA body preview:', t.slice(0, 500));

@@ -25,7 +25,7 @@ fun MainScreen(viewModel: MainViewModel) {
             TopAppBar(
                 title = {
                     Text(
-                        text = "terminal detox",
+                        text = "minidash",
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.primary
                     )

@@ -63,7 +63,7 @@ async function fetchFromRSSFeeds(category: string): Promise<NewsItem[]> {
     try {
       const response = await fetch(feedUrl, {
         headers: {
-          'User-Agent': 'Terminal-Detox-App/1.0',
+          'User-Agent': 'MiniDash/1.0',
         },
         next: { revalidate: 600 }, // Cache for 10 minutes
       });

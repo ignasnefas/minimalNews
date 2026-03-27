@@ -22,7 +22,7 @@ class WeatherAppWidget : AppWidgetProvider() {
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
-        if (intent.action == "com.minimalnews.REFRESH_WEATHER") {
+        if (intent.action == "com.minidash.REFRESH_WEATHER") {
             val manager = AppWidgetManager.getInstance(context)
             val ids = manager.getAppWidgetIds(ComponentName(context, WeatherAppWidget::class.java))
             ids.forEach { id -> displayFromCache(context, manager, id) }
@@ -67,7 +67,7 @@ class WeatherAppWidget : AppWidgetProvider() {
 
             // Refresh
             val refreshIntent = Intent(context, WeatherAppWidget::class.java).apply {
-                action = "com.minimalnews.REFRESH_WEATHER"
+                action = "com.minidash.REFRESH_WEATHER"
             }
             views.setOnClickPendingIntent(
                 R.id.refresh_button,

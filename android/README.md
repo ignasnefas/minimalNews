@@ -1,6 +1,6 @@
-# MinimalNews - Android
+# MiniDash - Android
 
-Native Android port of the Terminal Detox web app with full home screen widget support.
+Native Android port of the MiniDash web app with full home screen widget support.
 
 ## Setup
 

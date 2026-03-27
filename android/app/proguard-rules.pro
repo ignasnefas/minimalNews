@@ -1,6 +1,6 @@
 -keepattributes Signature
 -keepattributes *Annotation*
--keep class com.minimalnews.data.models.** { *; }
+-keep class com.minidash.data.models.** { *; }
 -keep class com.google.gson.** { *; }
 -dontwarn okhttp3.**
 -dontwarn okio.**

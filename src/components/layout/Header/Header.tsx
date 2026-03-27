@@ -12,14 +12,8 @@ interface HeaderProps {
 }
 
 const ASCII_LOGO = `
-════════════ DIGITAL DETOX TERMINAL ════════════`;
-
-const ASCII_LOGO_MOBILE = `
-┌─────────────────────┐
-│  TERMINAL DETOX     │
-│  ════════════════   │
-│  digital essentials │
-└─────────────────────┘`;
+════════════ MINI DASH ════════════
+digital essentials`;
 
 export default function Header({ onOpenCli }: HeaderProps) {
   const { widgets } = useWidgets();
@@ -29,8 +23,7 @@ export default function Header({ onOpenCli }: HeaderProps) {
   return (
     <header className={styles.header}>
       <div className={styles.logoContainer}>
-        <pre className={styles.logo} aria-label="Terminal Detox">{ASCII_LOGO}</pre>
-        <pre className={styles.logoMobile} aria-label="Terminal Detox">{ASCII_LOGO_MOBILE}</pre>
+        <pre className={styles.logo} aria-label="MiniDash">{ASCII_LOGO}</pre>
       </div>
       <div className={styles.topControls}>
         <ThemeToggle />

@@ -5,18 +5,18 @@ import '@/styles/globals.css';
 import '@/styles/terminal.css';
 
 export const metadata: Metadata = {
-  title: 'Terminal Detox - Digital Essentials Hub',
-  description: 'A minimal digital detox webapp that unites all essential stuff like weather, news, social media trending, Reddit, HackerNews in one place with a terminal aesthetic.',
-  keywords: ['digital detox', 'terminal', 'news aggregator', 'weather', 'reddit', 'hackernews', 'minimal'],
-  authors: [{ name: 'Terminal Detox' }],
+  title: 'MiniDash - Digital Essentials Hub',
+  description: 'A minimal digital essentials hub that unites all essential stuff like weather, news, social media trending, Reddit, HackerNews in one place with a terminal aesthetic.',
+  keywords: ['digital hub', 'terminal', 'news aggregator', 'weather', 'reddit', 'hackernews', 'minimal'],
+  authors: [{ name: 'MiniDash' }],
   openGraph: {
-    title: 'Terminal Detox - Digital Essentials Hub',
+    title: 'MiniDash - Digital Essentials Hub',
     description: 'Your minimal digital essentials hub with a terminal aesthetic',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Terminal Detox',
+    title: 'MiniDash',
     description: 'Your minimal digital essentials hub with a terminal aesthetic',
   },
 };

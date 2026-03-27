@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.minimalnews"
+    namespace = "com.minidash"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.minimalnews"
+        applicationId = "com.minidash"
         minSdk = 26
         targetSdk = 34
         versionCode = 1

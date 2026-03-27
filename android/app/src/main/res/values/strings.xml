@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">MinimalNews</string>
+    <string name="app_name">MiniDash</string>
 
     <!-- Widget descriptions -->
     <string name="widget_clock_desc">Terminal-style digital clock</string>

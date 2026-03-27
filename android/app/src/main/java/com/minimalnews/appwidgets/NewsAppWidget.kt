@@ -23,7 +23,7 @@ class NewsAppWidget : AppWidgetProvider() {
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
-        if (intent.action == "com.minimalnews.REFRESH_NEWS") {
+        if (intent.action == "com.minidash.REFRESH_NEWS") {
             val manager = AppWidgetManager.getInstance(context)
             val ids = manager.getAppWidgetIds(ComponentName(context, NewsAppWidget::class.java))
             ids.forEach { id -> displayFromCache(context, manager, id) }
@@ -66,7 +66,7 @@ class NewsAppWidget : AppWidgetProvider() {
 
             // Refresh
             val refreshIntent = Intent(context, NewsAppWidget::class.java).apply {
-                action = "com.minimalnews.REFRESH_NEWS"
+                action = "com.minidash.REFRESH_NEWS"
             }
             views.setOnClickPendingIntent(
                 R.id.refresh_button,

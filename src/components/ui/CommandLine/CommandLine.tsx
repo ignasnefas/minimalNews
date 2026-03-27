@@ -48,7 +48,7 @@ export default function CommandLine({ isOpen, onClose, onCommand }: CommandLineP
       inputRef.current?.focus();
       setHistory([]);
       setCurrentLine(0);
-      addToHistory('', 'Terminal Detox CLI v1.0.0\nType "help" for available commands.\n');
+      addToHistory('', 'MiniDash CLI v1.0.0\nType "help" for available commands.\n');
     }
   }, [isOpen]);
 

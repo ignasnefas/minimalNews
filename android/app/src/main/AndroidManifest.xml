@@ -4,20 +4,22 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
-        android:name=".MinimalNewsApp"
+        android:name=".MiniDashApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.MinimalNews"
+        android:theme="@style/Theme.MiniDash"
         tools:targetApi="34">
 
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.MinimalNews">
+            android:theme="@style/Theme.MiniDash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -41,7 +43,7 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.minimalnews.REFRESH_WEATHER" />
+                <action android:name="com.minidash.REFRESH_WEATHER" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
@@ -53,7 +55,7 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.minimalnews.REFRESH_NEWS" />
+                <action android:name="com.minidash.REFRESH_NEWS" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
@@ -65,7 +67,7 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.minimalnews.REFRESH_TODO" />
+                <action android:name="com.minidash.REFRESH_TODO" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
@@ -77,7 +79,7 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.minimalnews.REFRESH_QUOTE" />
+                <action android:name="com.minidash.REFRESH_QUOTE" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
@@ -89,7 +91,7 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.minimalnews.REFRESH_CRYPTO" />
+                <action android:name="com.minidash.REFRESH_CRYPTO" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
@@ -101,7 +103,7 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.minimalnews.REFRESH_HACKERNEWS" />
+                <action android:name="com.minidash.REFRESH_HACKERNEWS" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"

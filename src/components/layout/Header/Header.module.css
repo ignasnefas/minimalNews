@@ -153,14 +153,6 @@
 }
 
 @media (max-width: 768px) {
-  .logo {
-    display: none;
-  }
-  
-  .logoMobile {
-    display: inline-block;
-  }
-  
   .tagline {
     font-size: var(--font-size-xs);
   }

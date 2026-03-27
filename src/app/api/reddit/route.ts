@@ -24,7 +24,7 @@ export async function GET(request: Request) {
   function getUserAgent() {
     return (
       process.env.REDDIT_USER_AGENT ||
-      'minimal-news/1.0 (by u/minimal-news-app) - contact: https://github.com/your-user/minimalNews'
+      'minidash/1.0 (by u/minidash) - contact: https://github.com/minidash'
     );
   }
 

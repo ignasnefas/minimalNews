@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "MinimalNews"
+rootProject.name = "MiniDash"
 include(":app")

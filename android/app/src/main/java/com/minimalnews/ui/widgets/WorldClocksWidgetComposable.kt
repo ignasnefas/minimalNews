@@ -9,6 +9,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.minimalnews.ui.components.TerminalBox
 import com.minimalnews.ui.components.TerminalDivider
@@ -96,23 +98,35 @@ fun WorldClocksWidgetComposable() {
                 singleLine = true,
                 placeholder = {
                     Text(
-                        "e.g. Europe/Paris",
+                        "London, Tokyo, Europe/Paris...",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                     )
                 },
                 modifier = Modifier
-                    .weight(1f)
-                    .height(36.dp),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    .weight(1f),
+
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Done
+                ),
                 keyboardActions = KeyboardActions(onDone = {
-                    val tz = TimeZone.getTimeZone(newZone)
-                    if (tz.id != "GMT" || newZone.equals("GMT", true)) {
-                        zones = zones + newZone
-                        newZone = ""
+                    val input = newZone.trim()
+                    if (input.isNotBlank()) {
+                        val resolved = resolveTimezoneId(input)
+                        if (resolved != null && resolved !in zones) {
+                            zones = zones + resolved
+                            newZone = ""
+                        } else if (resolved == null) {
+                            // Show hint by clearing and leaving — user sees placeholder again
+                            newZone = ""
+                        }
                     }
                 }),
+                visualTransformation = VisualTransformation.None,
                 colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
                     focusedBorderColor = MaterialTheme.colorScheme.primary,
                     unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                     cursorColor = MaterialTheme.colorScheme.primary,
@@ -120,4 +134,36 @@ fun WorldClocksWidgetComposable() {
             )
         }
     }
+}
+
+/**
+ * Resolve a user-typed string to a valid IANA timezone ID.
+ * Accepts exact IDs (Europe/Paris), case-insensitive IDs, city-only names (paris → Europe/Paris),
+ * or common abbreviations (UTC, EST, PST, etc.).
+ */
+private fun resolveTimezoneId(input: String): String? {
+    val allIds = TimeZone.getAvailableIDs().toList()
+    // 1. Exact match
+    if (allIds.any { it.equals(input, ignoreCase = false) }) return input
+    // 2. Case-insensitive exact match
+    allIds.firstOrNull { it.equals(input, ignoreCase = true) }?.let { return it }
+    // 3. City suffix match  e.g. "paris" → "Europe/Paris"
+    val lowered = input.lowercase()
+    allIds.firstOrNull { it.substringAfterLast('/').lowercase() == lowered }?.let { return it }
+    // 4. Partial city name match  e.g. "new_york" or "new york"
+    val normalized = lowered.replace(' ', '_')
+    allIds.firstOrNull { it.substringAfterLast('/').lowercase() == normalized }?.let { return it }
+    // 5. Contains match
+    allIds.firstOrNull { it.lowercase().contains(lowered) }?.let { return it }
+    // 6. Known abbreviations
+    val abbrev = mapOf(
+        "est" to "America/New_York", "cst" to "America/Chicago",
+        "mst" to "America/Denver", "pst" to "America/Los_Angeles",
+        "gmt" to "GMT", "ist" to "Asia/Kolkata", "jst" to "Asia/Tokyo",
+        "aest" to "Australia/Sydney", "cet" to "Europe/Paris",
+        "bst" to "Europe/London"
+    )
+    abbrev[lowered]?.let { return it }
+    // 7. Give up — not found
+    return null
 }

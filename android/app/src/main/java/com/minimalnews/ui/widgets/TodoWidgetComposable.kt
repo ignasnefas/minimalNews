@@ -8,13 +8,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.minimalnews.data.local.AppDatabase
 import com.minimalnews.data.models.TodoItem
 import com.minimalnews.ui.components.TerminalBox
-import com.minimalnews.ui.components.TerminalDivider
 import kotlinx.coroutines.launch
 
 @Composable
@@ -23,65 +23,36 @@ fun TodoWidgetComposable(database: AppDatabase) {
     var newTodoText by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
 
-    val completed = todos.count { it.completed }
-
-    TerminalBox(
-        title = "todo",
-        status = "$completed/${todos.size} done"
-    ) {
-        // Add new todo
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                "$ new: ",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.secondary
-            )
-            OutlinedTextField(
+    TerminalBox(title = "todo", status = "${todos.count { it.completed }}/${todos.size} done") {
+        Column(Modifier.padding(12.dp)) {
+            // Input
+            TextField(
                 value = newTodoText,
                 onValueChange = { newTodoText = it },
-                textStyle = MaterialTheme.typography.bodySmall.copy(
-                    color = MaterialTheme.colorScheme.onBackground
-                ),
+                modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                placeholder = {
-                    Text(
-                        "Add a task...",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                    )
-                },
-                modifier = Modifier
-                    .weight(1f)
-                    .height(36.dp),
+                placeholder = { Text("new task", color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f), fontSize = 13.sp) },
+                textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.onBackground, fontSize = 13.sp),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onDone = {
-                    if (newTodoText.isNotBlank()) {
-                        scope.launch {
-                            database.todoDao().insert(TodoItem(text = newTodoText.trim()))
-                        }
+                    val t = newTodoText.trim()
+                    if (t.isNotEmpty()) {
+                        scope.launch { database.todoDao().insert(TodoItem(text = t)) }
                         newTodoText = ""
                     }
                 }),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                    cursorColor = MaterialTheme.colorScheme.primary,
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent
                 )
             )
-        }
 
-        Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(8.dp))
 
-        if (todos.isEmpty()) {
-            Text(
-                "No tasks yet.",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        } else {
+            // Items
             todos.forEach { todo ->
                 Row(
-                    modifier = Modifier
+                    Modifier
                         .fillMaxWidth()
                         .clickable {
                             scope.launch {
@@ -92,31 +63,28 @@ fun TodoWidgetComposable(database: AppDatabase) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = if (todo.completed) "[x]" else "[ ]",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = if (todo.completed) MaterialTheme.colorScheme.secondary
-                        else MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.width(28.dp)
+                        text = if (todo.completed) "[x] " else "[ ] ",
+                        color = MaterialTheme.colorScheme.primary,
+                        fontSize = 13.sp
                     )
                     Text(
-                        text = todo.text,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = if (todo.completed) MaterialTheme.colorScheme.onSurfaceVariant
-                        else MaterialTheme.colorScheme.onBackground,
-                        textDecoration = if (todo.completed) TextDecoration.LineThrough else null,
+                        text = todo.text.ifEmpty { "(empty)" },
+                        color = MaterialTheme.colorScheme.onBackground,
+                        fontSize = 13.sp,
                         modifier = Modifier.weight(1f)
                     )
                     Text(
-                        text = "✕",
-                        style = MaterialTheme.typography.labelSmall,
+                        text = " [del]",
                         color = MaterialTheme.colorScheme.error,
+                        fontSize = 12.sp,
                         modifier = Modifier.clickable {
                             scope.launch { database.todoDao().delete(todo) }
                         }
                     )
                 }
-                TerminalDivider()
             }
         }
     }
 }
+
+

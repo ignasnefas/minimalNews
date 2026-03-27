@@ -22,7 +22,7 @@ class QuoteAppWidget : AppWidgetProvider() {
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
-        if (intent.action == "com.minimalnews.REFRESH_QUOTE") {
+        if (intent.action == "com.minidash.REFRESH_QUOTE") {
             val manager = AppWidgetManager.getInstance(context)
             val ids = manager.getAppWidgetIds(ComponentName(context, QuoteAppWidget::class.java))
             ids.forEach { id -> displayFromCache(context, manager, id) }
@@ -62,7 +62,7 @@ class QuoteAppWidget : AppWidgetProvider() {
 
             // Refresh
             val refreshIntent = Intent(context, QuoteAppWidget::class.java).apply {
-                action = "com.minimalnews.REFRESH_QUOTE"
+                action = "com.minidash.REFRESH_QUOTE"
             }
             views.setOnClickPendingIntent(
                 R.id.refresh_button,

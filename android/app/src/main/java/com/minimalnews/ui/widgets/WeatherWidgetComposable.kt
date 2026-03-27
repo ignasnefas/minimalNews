@@ -1,28 +1,50 @@
 package com.minimalnews.ui.widgets
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.content.pm.PackageManager
+import android.location.Geocoder
+import android.location.LocationManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import com.minimalnews.data.models.WeatherData
 import com.minimalnews.data.repository.Repository
 import com.minimalnews.ui.components.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.Locale
 
+@SuppressLint("MissingPermission")
 @Composable
 fun WeatherWidgetComposable(repository: Repository) {
     var weather by remember { mutableStateOf<WeatherData?>(null) }
-    var loading by remember { mutableStateOf(true) }
+    var loading by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
-    var locationInput by remember { mutableStateOf("New York") }
-    var searchLocation by remember { mutableStateOf("New York") }
+    val savedLocation = remember {
+        repository.prefs.getString("weather_location", "") ?: ""
+    }
+    var locationInput by remember { mutableStateOf(savedLocation) }
+    var locating by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     fun loadWeather(location: String) {
+        if (location.isBlank()) return
         scope.launch {
             loading = true; error = null
             try {
@@ -35,19 +57,73 @@ fun WeatherWidgetComposable(repository: Repository) {
         }
     }
 
-    LaunchedEffect(searchLocation) {
-        loadWeather(searchLocation)
+    @SuppressLint("MissingPermission")
+    fun autoDetectLocation() {
+        locating = true; error = null
+        scope.launch(Dispatchers.IO) {
+            try {
+                val lm = context.getSystemService(LocationManager::class.java)
+                val providers = listOf(LocationManager.GPS_PROVIDER, LocationManager.NETWORK_PROVIDER)
+                var lat: Double? = null; var lon: Double? = null
+
+                for (provider in providers) {
+                    if (lm.isProviderEnabled(provider)) {
+                        val loc = lm.getLastKnownLocation(provider)
+                        if (loc != null) { lat = loc.latitude; lon = loc.longitude; break }
+                    }
+                }
+
+                if (lat != null && lon != null) {
+                    val geocoder = Geocoder(context, Locale.getDefault())
+                    @Suppress("DEPRECATION")
+                    val addresses = geocoder.getFromLocation(lat, lon, 1)
+                    val cityName = addresses?.firstOrNull()?.let { addr ->
+                        addr.locality ?: addr.subAdminArea ?: addr.adminArea
+                    } ?: "$lat,$lon"
+                    withContext(Dispatchers.Main) {
+                        locationInput = cityName
+                        locating = false
+                        loadWeather(cityName)
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        locating = false
+                        error = "Could not get location — enter city manually"
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    locating = false
+                    error = "Location error: ${e.message}"
+                }
+            }
+        }
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { grants ->
+        if (grants.values.any { it }) autoDetectLocation()
+        else error = "Location permission denied — enter city manually"
+    }
+
+    // Load saved location on first composition
+    LaunchedEffect(Unit) {
+        if (savedLocation.isNotBlank()) loadWeather(savedLocation)
     }
 
     TerminalBox(
         title = "weather",
         status = weather?.location ?: "",
-        onRefresh = { loadWeather(searchLocation) }
+        onRefresh = { loadWeather(locationInput) }
     ) {
-        // Location input
-        Row(modifier = Modifier.fillMaxWidth()) {
+        // Location input row
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Text(
-                text = "$ location: ",
+                text = "$ ",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.secondary
             )
@@ -57,26 +133,71 @@ fun WeatherWidgetComposable(repository: Repository) {
                 textStyle = MaterialTheme.typography.bodyMedium.copy(
                     color = MaterialTheme.colorScheme.onBackground
                 ),
+                placeholder = {
+                    Text(
+                        "Enter city...",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
+                    )
+                },
                 singleLine = true,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(36.dp),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                    .weight(1f),
+
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Search
+                ),
                 keyboardActions = KeyboardActions(onSearch = {
-                    searchLocation = locationInput
+                    loadWeather(locationInput)
                 }),
+                visualTransformation = VisualTransformation.None,
                 colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
                     focusedBorderColor = MaterialTheme.colorScheme.primary,
                     unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                     cursorColor = MaterialTheme.colorScheme.primary,
                 )
+            )
+            Spacer(Modifier.width(6.dp))
+            // GPS auto-detect button
+            Text(
+                text = if (locating) "…" else "⊕",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.clickable {
+                    val hasFine = ContextCompat.checkSelfPermission(
+                        context, Manifest.permission.ACCESS_FINE_LOCATION
+                    ) == PackageManager.PERMISSION_GRANTED
+                    val hasCoarse = ContextCompat.checkSelfPermission(
+                        context, Manifest.permission.ACCESS_COARSE_LOCATION
+                    ) == PackageManager.PERMISSION_GRANTED
+                    if (hasFine || hasCoarse) {
+                        autoDetectLocation()
+                    } else {
+                        permissionLauncher.launch(
+                            arrayOf(
+                                Manifest.permission.ACCESS_FINE_LOCATION,
+                                Manifest.permission.ACCESS_COARSE_LOCATION
+                            )
+                        )
+                    }
+                }
             )
         }
 
         Spacer(Modifier.height(12.dp))
 
         when {
+            locating -> TerminalLoading("Getting your location...")
             loading -> TerminalLoading("Fetching weather data...")
+            locationInput.isBlank() && weather == null ->
+                Text(
+                    "Enter a city or tap ⊕ to detect location",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             error != null -> TerminalError(error!!)
             weather != null -> {
                 val w = weather!!

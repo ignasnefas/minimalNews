@@ -18,7 +18,7 @@ class Repository(context: Context) {
         .addInterceptor { chain ->
             chain.proceed(
                 chain.request().newBuilder()
-                    .header("User-Agent", "MinimalNews/1.0 Android")
+                    .header("User-Agent", "MiniDash/1.0 Android")
                     .build()
             )
         }
@@ -277,15 +277,19 @@ class Repository(context: Context) {
         val json = JsonParser.parseString(fetch(url)).asJsonObject
         val items = json.getAsJsonArray("items")
 
-        items.map { item ->
-            val obj = item.asJsonObject
-            GitHubTrending(
-                name = obj.get("full_name").asString,
-                description = obj.get("description")?.asString ?: "",
-                language = obj.get("language")?.asString ?: "Unknown",
-                stars = obj.get("stargazers_count").asInt,
-                url = obj.get("html_url").asString
-            )
+        items.mapNotNull { item ->
+            try {
+                val obj = item.asJsonObject
+                GitHubTrending(
+                    name = obj.get("full_name").asString,
+                    description = obj.get("description")
+                        ?.takeIf { !it.isJsonNull }?.asString ?: "",
+                    language = obj.get("language")
+                        ?.takeIf { !it.isJsonNull }?.asString ?: "Unknown",
+                    stars = obj.get("stargazers_count").asInt,
+                    url = obj.get("html_url").asString
+                )
+            } catch (_: Exception) { null }
         }
     }
 

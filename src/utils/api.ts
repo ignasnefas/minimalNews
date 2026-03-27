@@ -9,7 +9,7 @@ export async function apiFetch<T>(
   try {
     const response = await fetch(url, {
       headers: {
-        'User-Agent': 'Terminal-Detox-App/1.0',
+        'User-Agent': 'MiniDash/1.0',
         ...options?.headers,
       },
       ...options,

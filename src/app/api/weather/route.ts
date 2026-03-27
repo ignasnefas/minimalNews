@@ -93,7 +93,7 @@ export async function GET(request: Request) {
       if (lat == null || lon == null) {
         const geocodeResponse = await fetch(
           `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(location)}&format=json&limit=1`,
-          { headers: { 'User-Agent': 'minimalNews/1.0 (contact@example.com)' } }
+          { headers: { 'User-Agent': 'minidash/1.0 (contact@example.com)' } }
         );
         if (!geocodeResponse.ok) {
           const body = await geocodeResponse.text().catch(() => '<unreadable body>');

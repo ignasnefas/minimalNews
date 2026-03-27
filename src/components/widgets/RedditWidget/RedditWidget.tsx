@@ -52,7 +52,7 @@ export default function RedditWidget({ subreddit: initialSubreddit = 'all' }: Re
     try {
       const response = await fetch(redditUrl, {
         headers: {
-          'User-Agent': 'minimal-news/1.0',
+          'User-Agent': 'minidash/1.0',
           'Accept': 'application/json',
         },
       });
